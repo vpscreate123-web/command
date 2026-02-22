@@ -2,139 +2,111 @@
 
 set -u
 
-# ===== COLORS =====
-C=$'\033[36m'
+# ==== COLORS ====
 G=$'\033[32m'
 R=$'\033[31m'
-B=$'\033[34m'
+C=$'\033[36m'
 Y=$'\033[33m'
-W=$'\033[97m'
 N=$'\033[0m'
 
-# ===== BIG HEADER =====
+panel_status() {
+if [ -d "/var/www/pterodactyl" ]; then
+echo -e "PANEL STATUS: ${G}INSTALLED ✔${N}"
+else
+echo -e "PANEL STATUS: ${R}NOT INSTALLED ✖${N}"
+fi
+}
+
 header() {
 clear
 echo -e "${C}"
 cat << "EOF"
 
-████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗  ██████╗ ██╗  ██╗
-╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗██╔═══██╗╚██╗██╔╝
-   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝██║   ██║ ╚███╔╝ 
-   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗██║   ██║ ██╔██╗ 
-   ██║      ██║   ██║  ██║██║  ██╗██║  ██║╚██████╔╝██╔╝ ██╗
-   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗ 
+╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗
+   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝
+   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗
+   ██║      ██║   ██║  ██║██║  ██╗██║  ██║
+   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 
 EOF
-echo -e "${Y}🚀 TYRKROX_GAMER - ULTIMATE SERVER TOOL 🚀${N}"
-echo -e "${B}=========================================================${N}"
+echo -e "${Y}🚀 TYRKROX_GAMER 🚀${N}"
 echo ""
 }
 
-pause() {
-echo ""
-read -p "Press [Enter] to continue..." dummy
-}
+pause(){ read -p "Press Enter to continue..." dummy; }
 
-# ===== PANEL SUBMENU =====
-panel_menu() {
+# ===== PANEL MANAGER BOX =====
+panel_manager() {
 while true; do
 clear
-echo -e "${B}==========================================${N}"
-echo -e "${Y}        SERVER PANEL MANAGER${N}"
-echo -e "${B}==========================================${N}"
+echo "=========================================="
+echo "          PTERODACTYL MANAGER"
+echo "=========================================="
+panel_status
+echo "------------------------------------------"
+echo "[1] Install Panel        (Fresh Install)"
+echo "[2] Create User          (Add Admin/User)"
+echo "[3] Update Panel         (Latest Version)"
+echo "[4] Change Domain + SSL"
+echo "[5] Uninstall Panel"
 echo ""
-echo " 1) FeatherPanel"
-echo " 2) Pterodactyl"
-echo " 3) Jexactyl"
-echo " 4) JexPanel"
-echo " 5) MythicalDash"
-echo " 6) MythicalDash v3"
-echo " 7) Payment Gateway"
-echo " 8) CtrlPanel"
-echo " 9) Reviacly"
-echo "10) Tools (Ext)"
-echo -e "${R}11) Back${N}"
-echo ""
+echo "[6] Back"
+echo "=========================================="
+read -p "Enter choice [1-6]: " pm
 
-read -p "Enter your choice [1-11]: " panel_choice
-
-case $panel_choice in
-1) echo "Installing FeatherPanel..." ;;
-2) bash <(curl -s https://pterodactyl-installer.se) ;;
-3) echo "Installing Jexactyl..." ;;
-4) echo "Installing JexPanel..." ;;
-5) echo "Installing MythicalDash..." ;;
-6) echo "Installing MythicalDash v3..." ;;
-7) echo "Installing Payment Gateway..." ;;
-8) echo "Installing CtrlPanel..." ;;
-9) echo "Installing Reviacly..." ;;
-10) echo "Installing Extra Tools..." ;;
-11) break ;;
+case $pm in
+1) bash <(curl -s https://pterodactyl-installer.se) ;;
+2) cd /var/www/pterodactyl 2>/dev/null && php artisan p:user:make ;;
+3) cd /var/www/pterodactyl 2>/dev/null && php artisan p:upgrade ;;
+4) bash <(curl -s https://pterodactyl-installer.se) ;;
+5) rm -rf /var/www/pterodactyl && echo "Panel Removed." ;;
+6) break ;;
 *) echo "Invalid option!" ; sleep 2 ;;
 esac
-
 pause
 done
 }
 
-# ===== MAIN MENU =====
+# ===== MAIN MENU BOX =====
 while true; do
 header
-
-echo -e "${C} 1) ${W}Discord Server Link${N}"
-echo -e "${C} 2) ${W}YouTube Channel Link${N}"
-echo -e "${C} 3) ${W}VM / KVM Installer${N}"
-echo -e "${C} 4) ${W}Panel + Wings Manager${N}"
-echo -e "${C} 5) ${W}SFTP Fixer${N}"
-echo -e "${C} 6) ${W}Tailscale VPN${N}"
-echo -e "${C} 7) ${W}Proxmox Docker Install${N}"
-echo -e "${R} 8) Exit${N}"
+echo "=========================================="
+echo "               MAIN MENU"
+echo "=========================================="
+panel_status
+echo "------------------------------------------"
+echo "[1] Install Pterodactyl Panel"
+echo "[2] Install Wings"
+echo "[3] Panel Manager"
+echo "[4] Install Proxmox (Docker)"
 echo ""
-
-read -p "👉 Select option [1-8]: " choice
+echo "[5] Exit"
+echo "=========================================="
+read -p "Select option [1-5]: " choice
 
 case $choice in
 1)
-echo "🔗 https://discord.gg/2rYEHharqA"
+bash <(curl -s https://pterodactyl-installer.se)
 pause ;;
 2)
-echo "🔗 https://youtube.com/@tyrkrox_gamer"
+bash <(curl -s https://pterodactyl-installer.se)
 pause ;;
 3)
-bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/001)
-pause ;;
+panel_manager ;;
 4)
-panel_menu ;;
-5)
-bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/ssh.sh)
-pause ;;
-6)
-curl -fsSL https://tailscale.com/install.sh | sh
-pause ;;
-7)
-echo "🚀 Installing Proxmox (Docker Version)..."
-
 docker run -itd \
 --name proxmoxve \
 --hostname pve \
 --privileged \
---cgroupns=host \
---security-opt apparmor=unconfined \
---security-opt seccomp=unconfined \
--v /sys/fs/cgroup:/sys/fs/cgroup:rw \
--v /lib/modules:/lib/modules:ro \
--v /dev/fuse:/dev/fuse \
 -p 8006:8006 \
 --restart unless-stopped \
 rtedpro/proxmox:9.0.11
-
-echo "✅ Proxmox started on port 8006"
 pause ;;
-8)
-echo "👋 Exiting..."
+5)
 exit 0 ;;
 *)
-echo "❌ Invalid Option!"
+echo "Invalid option!"
 sleep 2 ;;
 esac
 
