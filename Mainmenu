@@ -5,124 +5,76 @@
 
 set -u
 
-# --- ANSI COLORS ---
-C=$'\033[36m'  # Cyan
-G=$'\033[32m'  # Green
-R=$'\033[31m'  # Red
-B=$'\033[34m'  # Blue
-Y=$'\033[33m'  # Yellow
-W=$'\033[97m'  # White
-N=$'\033[0m'   # Reset
+C=$'\033[36m'
+G=$'\033[32m'
+R=$'\033[31m'
+B=$'\033[34m'
+Y=$'\033[33m'
+W=$'\033[97m'
+N=$'\033[0m'
 
-# --- HEADER FUNCTION ---
 header() {
     clear
-    echo -e "${B}  __  __       _         __  __                  ${N}"
-    echo -e "${B} |  \/  | __ _(_)_ __   |  \/  | ___ _ __  _   _ ${N}"
-    echo -e "${B} | |\/| |/ _\` | | '_ \  | |\/| |/ _ \ '_ \| | | |${N}"
-    echo -e "${B} | |  | | (_| | | | | | | |  | |  __/ | | | |_| |${N}"
-    echo -e "${B} |_|  |_|\__,_|_|_| |_| |_|  |_|\___|_| |_|\__,_|${N}"
     echo -e "${B}=====================================================${N}"
-    echo -e "${Y}      🚀 Subscribe To Tyrkrox_gamer      ${N}"
+    echo -e "${Y}      🚀 Tyrkrox_gamer - ALL IN ONE TOOL${N}"
     echo -e "${B}=====================================================${N}"
     echo ""
 }
 
-# --- PAUSE FUNCTION ---
 pause() {
     echo ""
-    read -p "${W}Press [Enter] to return to menu...${N}" dummy
+    read -p "Press [Enter] to return to menu..." dummy
 }
 
-# --- MAIN LOOP ---
 while true; do
     header
     echo -e "${C} 1) ${W}Discord Server Link${N}"
     echo -e "${C} 2) ${W}YouTube Channel Link${N}"
-    echo -e "${C} 3) ${W}Vm/Kvm Installer ${G}(Working in AnyVPS)${N}"
-    echo -e "${C} 4) ${W}Pterodactyl Panel + Wings Installer ${G}(Pterodactyl Setup)${N}"
-    echo -e "${C} 5) ${W}Pterodactyl Blueprint + Addon Installer ${G}(Pterodactyl Blueprint + Addons)${N}"
-    echo -e "${C} 6) ${W}SFTP FIXER ${G}(Working In AnyVPS)${N}"
-    echo -e "${C} 7) ${W}Tailscale Installer ${G}(VPN)${N}"
-    echo -e "${R} 8) Exit${N}"
+    echo -e "${C} 3) ${W}Vm/Kvm Installer${N}"
+    echo -e "${C} 4) ${W}Pterodactyl Panel + Wings${N}"
+    echo -e "${C} 5) ${W}Blueprint + Addon${N}"
+    echo -e "${C} 6) ${W}SFTP Fixer${N}"
+    echo -e "${C} 7) ${W}Tailscale Installer${N}"
+    echo -e "${C} 8) ${W}Proxmox Docker Installer${N}"
+    echo -e "${R} 9) Exit${N}"
     echo ""
-    echo -e "${B}=====================================================${N}"
-    read -p "${Y}👉 Select an option [1-8]: ${N}" choice
+    read -p "Select option [1-9]: " choice
 
     case $choice in
         1)
-            echo ""
-            echo -e "${B}📢 Join our Discord Server:${N}"
-            echo -e "${G}🔗 https://discord.gg/2rYEHharqA${N}"
-            echo ""
-            pause
-            ;;
+            echo "https://discord.gg/2rYEHharqA"
+            pause ;;
         2)
-            echo ""
-            echo -e "${R}📺 Subscribe to YouTube:${N}"
-            echo -e "${Y}🔗 https://youtube.com/@tyrkrox_gamer?si=dJP1e038Wmi3tvjP${N}"
-            echo ""
-            pause
-            ;;
+            echo "https://youtube.com/@tyrkrox_gamer"
+            pause ;;
         3)
-            echo ""
-            echo -e "${Y}💻 Installing VM (IDX VPS)...${N}"
-            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/001)
-            pause
-            ;;
-       4)
-            echo ""
-            echo -e "${Y}🌐 Installing Pterodactyl panel + wings...${N}"
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/001)
+            pause ;;
+        4)
             bash <(curl -s https://pterodactyl-installer.se)
-            pause
-            ;;
-       5)
-            echo ""
-            echo -e "${Y}🖥️  Installing Blueprint + Addon${N}"
-            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/002)
-            pause
-            ;;
-       6)
-            echo ""
-            echo -e "${Y}🖥️  Fixing SFTP...${N}"
-            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/ssh.sh)
-            pause
-            ;;
-       7)
-            echo ""
-            echo -e "${Y}🌐 Installing Tailscale VPN...${N}"
+            pause ;;
+        5)
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/002)
+            pause ;;
+        6)
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/ssh.sh)
+            pause ;;
+        7)
             curl -fsSL https://tailscale.com/install.sh | sh
-            pause
-            ;;
-7)
-            echo ""
-            echo -e "${Y}☠️ installung proxmox ...${N}"
-              docker run -itd \
-             --name proxmoxve \
-             --hostname pve \
-             --privileged \
-             --cgroupns=host \
-             --security-opt apparmor=unconfined \
-             --security-opt seccomp=unconfined \
-             -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
-             -v /lib/modules:/lib/modules:ro \
-             -v /dev/fuse:/dev/fuse \
-             -v /sys/kernel/debug:/sys/kernel/debug \
-              -p 8006:8006 \
-             --restart unless-stopped \
-              rtedpro/proxmox:9.0.11
-            pause
-            ;;
-       9 )
-            echo "'
-            echo -e "${G}👋 Exiting... Thanks for using!${N}"
-            exit 0
-            ;;
+            pause ;;
+        8)
+            docker run -itd \
+            --name proxmoxve \
+            --hostname pve \
+            --privileged \
+            -p 8006:8006 \
+            rtedpro/proxmox:9.0.11
+            pause ;;
+        9)
+            echo "Exiting..."
+            exit 0 ;;
         *)
-            echo ""
-            echo -e "${R}❌ Invalid Option! Please select between 1-10.${N}"
-            sleep 2
-            ;;
+            echo "Invalid Option!"
+            sleep 2 ;;
     esac
 done
-EOF
