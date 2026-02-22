@@ -9,7 +9,9 @@ Y=$'\033[33m'
 W=$'\033[97m'
 N=$'\033[0m'
 
-# ===== ANIMATION =====
+pause(){ read -p "Press Enter to continue..." temp; }
+
+# ===== BOOT ANIMATION =====
 typewriter() {
     text="$1"
     for ((i=0; i<${#text}; i++)); do
@@ -19,148 +21,237 @@ typewriter() {
     echo ""
 }
 
-spinner() {
-    pid=$!
-    spin='-\|/'
-    i=0
-    while kill -0 $pid 2>/dev/null; do
-        i=$(( (i+1) %4 ))
-        printf "\r${Y}Loading ${spin:$i:1}${N}"
-        sleep .1
-    done
-    printf "\r"
-}
-
-boot_animation() {
+boot_animation(){
 clear
 echo -e "${C}"
-typewriter "Initializing Private Hyper System..."
-sleep 0.4
-typewriter "Loading Secure Modules..."
-sleep 0.4
-typewriter "Checking Virtualization..."
-sleep 0.4
+typewriter "Initializing Tyrkrox Hyper System..."
+sleep 0.5
+typewriter "Loading Core Modules..."
+sleep 0.5
+typewriter "Checking System Compatibility..."
+sleep 0.5
 echo -e "${G}System Ready ✅${N}"
 sleep 1
 }
 
-header() {
+header(){
 clear
 echo -e "${C}"
-echo "██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗"
-echo "██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝"
-echo "██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗  "
-echo "██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  "
-echo "██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗"
-echo "╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝"
-echo -e "${N}"
-echo -e "${Y}"
-typewriter "=========== PRIVATE CONTROL PANEL ==========="
-echo -e "${N}"
+echo "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗"
+echo "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗"
+echo "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝"
+echo "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗"
+echo "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║"
+echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
+echo -e "${Y}=========== TYRKROX CONTROL PANEL ===========${N}"
 echo ""
 }
 
-pause(){ read -p "Press Enter to continue..." temp; }
-
-# ===== PANEL =====
-panel_status() {
-if [ -d "/var/www/panel" ]; then
-echo -e "${G}PRIVATE PANEL STATUS: INSTALLED ✅${N}"
-else
-echo -e "${R}PRIVATE PANEL STATUS: NOT INSTALLED ❌${N}"
+# ===== AUTO CHECK =====
+install_docker(){
+if ! command -v docker &> /dev/null; then
+    echo -e "${Y}Installing Docker...${N}"
+    apt update -y
+    apt install -y docker.io
 fi
 }
 
-install_panel() {
+# ================= PANEL =================
+
+install_panel(){
 header
-panel_status
+apt update -y
+apt install -y nginx mysql-server php php-fpm curl unzip
+mkdir -p /var/www/panel
+echo "Panel Installed Successfully" > /var/www/panel/index.html
+systemctl restart nginx
+echo -e "${G}Panel Installed Successfully ✅${N}"
+pause
+}
+
+create_panel_user(){
+header
+read -p "Username: " user
+read -p "Password: " pass
+useradd -m $user
+echo "$user:$pass" | chpasswd
+echo -e "${G}User Created Successfully ✅${N}"
+pause
+}
+
+update_panel(){
+header
+apt update -y && apt upgrade -y
+echo -e "${G}System Updated Successfully ✅${N}"
+pause
+}
+
+uninstall_panel(){
+header
+rm -rf /var/www/panel
+apt remove -y nginx mysql-server php*
+echo -e "${R}Panel Removed Successfully ❌${N}"
+pause
+}
+
+panel_menu(){
+while true; do
+header
+echo "[1] Install Panel"
+echo "[2] Create Panel User"
+echo "[3] Update Panel"
+echo "[4] Uninstall Panel"
+echo "[0] Back"
 echo ""
-apt update -y & spinner
-apt install -y curl git unzip software-properties-common & spinner
-echo -e "${G}Private Panel Base Installed (Secure Setup)${N}"
-pause
+
+read -p "Select Option: " p
+case $p in
+1) install_panel ;;
+2) create_panel_user ;;
+3) update_panel ;;
+4) uninstall_panel ;;
+0) break ;;
+*) echo "Invalid Option"; sleep 1 ;;
+esac
+done
 }
 
-# ===== WINGS =====
-install_wings(){
-header
-apt install -y docker.io & spinner
-echo -e "${G}Wings Installed (Docker Ready)${N}"
-pause
-}
+# ================= IVM (DOCKER VM MANAGER) =================
 
-# ===== IVM =====
-create_ivm(){
+ivm_menu(){
+install_docker
+while true; do
 header
-echo -e "${C}CREATE IVM (DOCKER BASED)${N}"
-apt install -y docker.io & spinner
+echo -e "${C}IVM MANAGER (Docker Based)${N}"
+echo ""
+echo "1) Create Container"
+echo "2) Start Container"
+echo "3) Stop Container"
+echo "4) Delete Container"
+echo "5) List Containers"
+echo "0) Back"
+echo ""
 
+read -p "Select Option: " i
+case $i in
+1)
 read -p "Container Name: " NAME
-read -p "RAM (MB): " RAM
-read -p "CPU Limit: " CPU
-
-docker run -dit --name $NAME --memory="${RAM}m" --cpus="$CPU" ubuntu:22.04 & spinner
-
-echo -e "${G}IVM Created Successfully!${N}"
-pause
+docker run -dit --name $NAME ubuntu:22.04
+echo -e "${G}Container Created ✅${N}"
+pause ;;
+2)
+read -p "Container Name: " NAME
+docker start $NAME
+pause ;;
+3)
+read -p "Container Name: " NAME
+docker stop $NAME
+pause ;;
+4)
+read -p "Container Name: " NAME
+docker rm -f $NAME
+pause ;;
+5)
+docker ps -a
+pause ;;
+0) break ;;
+*) echo "Invalid"; sleep 1 ;;
+esac
+done
 }
 
-# ===== KVM =====
-create_kvm(){
-header
-echo -e "${C}CREATE KVM${N}"
+# ================= KVM MANAGER =================
 
+kvm_menu(){
+header
 if ! egrep -q '(vmx|svm)' /proc/cpuinfo; then
-echo -e "${R}KVM NOT Supported ❌${N}"
+echo -e "${R}❌ KVM NOT Supported on this system${N}"
 pause
 return
 fi
 
-apt install -y qemu-kvm libvirt-daemon-system virtinst & spinner
+apt install -y qemu-kvm libvirt-daemon-system virtinst
 
-echo -e "${G}KVM Ready (Manual ISO Required)${N}"
+while true; do
+header
+echo -e "${C}SYSTEM MANAGER ACTIVE ► Pure QEMU Environment${N}"
+echo ""
+echo "1) Create VM"
+echo "2) List VMs"
+echo "3) Start VM"
+echo "4) Stop VM"
+echo "5) Delete VM"
+echo "0) Back"
+echo ""
+
+read -p "Select Option: " k
+case $k in
+1)
+read -p "VM Name: " VMNAME
+qemu-img create -f qcow2 /var/lib/libvirt/images/$VMNAME.qcow2 10G
+echo -e "${G}VM Disk Created (10GB) ✅${N}"
+pause ;;
+2)
+virsh list --all
+pause ;;
+3)
+read -p "VM Name: " VMNAME
+virsh start $VMNAME
+pause ;;
+4)
+read -p "VM Name: " VMNAME
+virsh shutdown $VMNAME
+pause ;;
+5)
+read -p "VM Name: " VMNAME
+virsh undefine $VMNAME
+pause ;;
+0) break ;;
+*) echo "Invalid"; sleep 1 ;;
+esac
+done
+}
+
+# ================= WINGS =================
+
+install_wings(){
+install_docker
+echo -e "${G}Wings Installed (Docker Ready) ✅${N}"
 pause
 }
 
-# ===== PROXMOX =====
+# ================= PROXMOX =================
+
 install_proxmox(){
-header
-echo -e "${C}INSTALL PROXMOX (DOCKER MODE)${N}"
-
-apt install -y docker.io & spinner
-
-docker run -itd \
---name proxmoxve \
---privileged \
--p 8006:8006 \
-rtedpro/proxmox:9.0.11 & spinner
-
+install_docker
+docker run -itd --name proxmoxve --privileged -p 8006:8006 rtedpro/proxmox:9.0.11
 echo -e "${G}Proxmox Running on Port 8006 🚀${N}"
 pause
 }
 
-# ===== START =====
+# ================= START =================
+
 boot_animation
 
 while true; do
 header
-echo -e "${C}[1]${W} Private Panel${N}"
-echo -e "${C}[2]${W} Install Wings${N}"
-echo -e "${C}[3]${W} Create IVM${N}"
-echo -e "${C}[4]${W} Create KVM${N}"
-echo -e "${C}[5]${W} Install Proxmox${N}"
-echo -e "${R}[6] Exit${N}"
+echo "[1] Panel Install"
+echo "[2] Install Wings"
+echo "[3] IVM Manager"
+echo "[4] KVM Manager"
+echo "[5] Install Proxmox"
+echo "[0] Exit"
 echo ""
 
 read -p "Select Option: " opt
 
 case $opt in
-1) install_panel ;;
+1) panel_menu ;;
 2) install_wings ;;
-3) create_ivm ;;
-4) create_kvm ;;
+3) ivm_menu ;;
+4) kvm_menu ;;
 5) install_proxmox ;;
-6) exit 0 ;;
+0) exit 0 ;;
 *) echo "Invalid Option"; sleep 1 ;;
 esac
 
