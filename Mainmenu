@@ -22,22 +22,14 @@ echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚�
 echo -e "${N}"
 }
 
-# ================= BOOT =================
-
 boot(){
 clear
 logo
 echo -e "${C}🚀 Initializing TYRKROX Hyper System...${N}"
 sleep 0.5
-echo -e "${C}⚙️ Loading Modules...${N}"
-sleep 0.5
-echo -e "${C}🔍 Checking Compatibility...${N}"
-sleep 0.5
 echo -e "${G}✅ System Ready${N}"
 sleep 1
 }
-
-# ================= STATUS =================
 
 kvm_status(){
 if egrep -q '(vmx|svm)' /proc/cpuinfo; then
@@ -67,49 +59,16 @@ systemctl start docker
 fi
 }
 
-# ================= PANEL =================
+# ================= KVM INSTALL =================
 
-panel_menu(){
-while true; do
-header
-echo "🖥️ PANEL MANAGEMENT"
-echo "[1] Install Panel"
-echo "[2] Create User"
-echo "[3] Update Panel"
-echo "[4] Remove Panel"
-echo "[0] Back"
-echo ""
-
-read -p "Select: " p
-case $p in
-1)
+install_kvm(){
+if ! command -v virsh &> /dev/null; then
+echo -e "${Y}Installing KVM...${N}"
 apt update -y
-apt install -y nginx mysql-server php php-fpm curl unzip
-mkdir -p /var/www/panel
-echo "TYRKROX PANEL ACTIVE" > /var/www/panel/index.html
-systemctl restart nginx
-echo "Panel Installed"
-pause ;;
-2)
-read -p "Username: " user
-read -p "Password: " pass
-useradd -m $user
-echo "$user:$pass" | chpasswd
-echo "User Created"
-pause ;;
-3)
-apt update -y && apt upgrade -y
-echo "Panel Updated"
-pause ;;
-4)
-rm -rf /var/www/panel
-apt remove -y nginx mysql-server php*
-echo "Panel Removed"
-pause ;;
-0) break ;;
-*) echo "Invalid"; sleep 1 ;;
-esac
-done
+apt install -y qemu-kvm libvirt-daemon-system libvirt-clients virtinst
+systemctl enable libvirtd
+systemctl start libvirtd
+fi
 }
 
 # ================= IVM =================
@@ -124,21 +83,34 @@ echo "[2] Start VM"
 echo "[3] Stop VM"
 echo "[4] Delete VM"
 echo "[5] List VMs"
+echo "[6] VM Info"
 echo "[0] Back"
 echo ""
 
 read -p "Select: " i
 case $i in
 1)
+echo "Select OS:"
+echo "1) Ubuntu 22.04"
+echo "2) Ubuntu 24.04"
+echo "3) Debian 12"
+read -p "Choose: " os
+case $os in
+1) IMAGE="ubuntu:22.04" ;;
+2) IMAGE="ubuntu:24.04" ;;
+3) IMAGE="debian:12" ;;
+*) IMAGE="ubuntu:22.04" ;;
+esac
 read -p "VM Name: " NAME
-docker pull ubuntu:22.04
-docker run -dit --name $NAME --restart unless-stopped ubuntu:22.04 sleep infinity
+docker pull $IMAGE
+docker run -dit --name $NAME --restart unless-stopped $IMAGE sleep infinity
 echo "VM Created"
 pause ;;
 2) read -p "VM Name: " NAME; docker start $NAME; pause ;;
 3) read -p "VM Name: " NAME; docker stop $NAME; pause ;;
 4) read -p "VM Name: " NAME; docker rm -f $NAME; pause ;;
 5) docker ps -a; pause ;;
+6) read -p "VM Name: " NAME; docker inspect $NAME; pause ;;
 0) break ;;
 *) echo "Invalid"; sleep 1 ;;
 esac
@@ -148,22 +120,40 @@ done
 # ================= KVM =================
 
 kvm_menu(){
+install_kvm
 while true; do
 header
 echo "💻 KVM MANAGER"
-echo "[1] List VMs"
-echo "[2] Start VM"
-echo "[3] Stop VM"
-echo "[4] Delete VM"
+echo "[1] Create VM"
+echo "[2] List VMs"
+echo "[3] Start VM"
+echo "[4] Stop VM"
+echo "[5] Delete VM"
+echo "[6] VM Info"
+echo "[7] Resize Disk"
 echo "[0] Back"
 echo ""
 
 read -p "Select: " k
 case $k in
-1) virsh list --all; pause ;;
-2) read -p "VM Name: " VM; virsh start $VM; pause ;;
-3) read -p "VM Name: " VM; virsh shutdown $VM; pause ;;
-4) read -p "VM Name: " VM; virsh undefine $VM; pause ;;
+1)
+read -p "VM Name: " NAME
+read -p "RAM MB: " RAM
+read -p "CPU Cores: " CPU
+read -p "Disk GB: " DISK
+qemu-img create -f qcow2 /var/lib/libvirt/images/$NAME.qcow2 ${DISK}G
+virt-install --name $NAME --ram $RAM --vcpus $CPU \
+--disk path=/var/lib/libvirt/images/$NAME.qcow2 \
+--os-variant ubuntu22.04 \
+--network network=default \
+--graphics vnc --noautoconsole
+pause ;;
+2) virsh list --all; pause ;;
+3) read -p "VM Name: " VM; virsh start $VM; pause ;;
+4) read -p "VM Name: " VM; virsh shutdown $VM; pause ;;
+5) read -p "VM Name: " VM; virsh undefine $VM --remove-all-storage; pause ;;
+6) read -p "VM Name: " VM; virsh dominfo $VM; pause ;;
+7) read -p "VM Name: " VM; read -p "New Size GB: " SIZE; qemu-img resize /var/lib/libvirt/images/$VM.qcow2 ${SIZE}G; pause ;;
 0) break ;;
 *) echo "Invalid"; sleep 1 ;;
 esac
@@ -182,7 +172,6 @@ pause
 
 install_proxmox(){
 install_docker
-
 if docker ps -a | grep -q proxmoxve; then
 echo "Proxmox Already Installed"
 else
@@ -201,7 +190,6 @@ docker run -itd \
   --restart unless-stopped \
   rtedpro/proxmox:9.0.11
 fi
-
 echo "Access Proxmox: https://SERVER-IP:8006"
 pause
 }
