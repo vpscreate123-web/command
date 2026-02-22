@@ -122,7 +122,333 @@ while true; do
             pause
             ;;
         4)
-            # ==========================================
+          #!/usr/bin/env bash
+# ==========================================
+#        🚀 TYRKROX NODE 🚀
+# ==========================================
+
+set -u
+
+# ---- COLORS ----
+C=$'\033[36m'
+G=$'\033[32m'
+R=$'\033[31m'
+B=$'\033[34m'
+Y=$'\033[33m'
+W=$'\033[97m'
+P=$'\033[35m'
+BLINK=$'\033[5m'
+N=$'\033[0m'
+
+# ---- TYPEWRITER EFFECT ----
+typewriter() {
+    text="$1"
+    delay=0.01
+    for ((i=0; i<${#text}; i++)); do
+        printf "%s" "${text:$i:1}"
+        sleep $delay
+    done
+    printf "\n"
+}
+
+# ---- PROGRESS BAR ----
+progress_bar() {
+    echo -e "${C}Initializing TYRKROX NODE...${N}"
+    for i in {1..30}; do
+        printf "${G}#${N}"
+        sleep 0.05
+    done
+    echo ""
+    for i in {0..100..10}; do
+        printf "\r${Y}Loading System: $i%%%${N}"
+        sleep 0.2
+    done
+    echo ""
+    sleep 1
+}
+
+# ---- CINEMATIC INTRO ----
+intro() {
+    clear
+    echo -e "${P}"
+    typewriter "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗  ██████╗ ██╗  ██╗"
+    typewriter "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗██╔═══██╗╚██╗██╔╝"
+    typewriter "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝██║   ██║ ╚███╔╝ "
+    typewriter "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗██║   ██║ ██╔██╗ "
+    typewriter "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║╚██████╔╝██╔╝ ██╗"
+    typewriter "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝"
+    echo -e "${N}"
+    echo ""
+    typewriter "💎 TYRKROX NODE BOOTING..."
+    sleep 1
+    progress_bar
+    clear
+}
+
+# ---- HEADER ----
+header() {
+    echo -e "${P}${BLINK}💎 TYRKROX NODE 💎${N}"
+    echo -e "${Y}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+    echo ""
+}
+
+pause() {
+    echo ""
+    read -p "${W}🔁 Press [Enter] to return...${N}" dummy
+}
+
+# ---- START INTRO ----
+intro
+
+# ---- MAIN LOOP ----
+while true; do
+    clear
+    header
+
+    echo -e "${C} 1) ${W}📢 Discord Server Link${N}"
+    echo -e "${C} 2) ${W}🐳 Proxmox VE (Docker) Install 🚀${N}"
+    echo -e "${C} 3) ${W}💻 VM/KVM Installer${N}"
+    echo -e "${C} 4) ${W}🌐 Pterodactyl Panel + Wings Installer${N}"
+    echo -e "${C} 5) ${W}🖥️ Blueprint + Addon Installer${N}"
+    echo -e "${C} 6) ${W}🔧 SFTP Fixer${N}"
+    echo -e "${C} 7) ${W}🌍 Tailscale VPN Installer${N}"
+    echo -e "${R} 8) ❌ Exit${N}"
+
+    echo ""
+    echo -e "${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
+    read -p "${Y}👉 Select an option [1-8]: ${N}" choice
+
+    case $choice in
+        1)
+            echo -e "${G}🔗 https://discord.gg/2rYEHharqA${N}"
+            pause
+            ;;
+        2)
+            echo -e "${Y}🐳 Installing Proxmox VE...${N}"
+            docker run -itd \
+              --name proxmoxve \
+              --hostname pve \
+              --privileged \
+              --cgroupns=host \
+              --security-opt apparmor=unconfined \
+              --security-opt seccomp=unconfined \
+              -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+              -v /lib/modules:/lib/modules:ro \
+              -v /dev/fuse:/dev/fuse \
+              -v /sys/kernel/debug:/sys/kernel/debug \
+              -p 8006:8006 \
+              --restart unless-stopped \
+              rtedpro/proxmox:9.0.11
+            pause
+            ;;
+        3)
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/001)
+            pause
+            ;;
+        4)
+             #!/bin/bash
+
+# ====================================================
+#       PTERODACTYL CONTROL CENTER v2.1
+# ====================================================
+
+# --- COLORS & STYLING ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# --- UI HELPER FUNCTIONS ---
+
+show_header() {
+    clear
+    echo -e "${PURPLE}════════════════════════════════════════════════════════════${NC}"
+    echo -e "${PURPLE}║${NC}         ${BOLD}${WHITE}PTERODACTYL SERVER MANAGEMENT SYSTEM${NC}             ${PURPLE}║${NC}"
+    echo -e "${PURPLE}════════════════════════════════════════════════════════════${NC}"
+    echo -e "${CYAN}  Current Module: ${YELLOW}$1${NC}"
+    echo -e "${PURPLE}────────────────────────────────────────────────────────────${NC}"
+    echo ""
+}
+
+status_msg() {
+    # $1 = Type (OK, ERR, INFO, WAIT), $2 = Message
+    case $1 in
+        "OK")   echo -e "  [${GREEN} ✔ ${NC}] $2" ;;
+        "ERR")  echo -e "  [${RED} ✘ ${NC}] $2" ;;
+        "INFO") echo -e "  [${CYAN} ➜ ${NC}] $2" ;;
+        "WAIT") echo -e "  [${YELLOW} ⏳ ${NC}] $2" ;;
+    esac
+}
+
+pause() {
+    echo ""
+    read -p "  Press [Enter] to return to main menu..."
+}
+
+# ================== INSTALL FUNCTION ==================
+install_ptero() {
+    show_header "PANEL INSTALLATION"
+    
+    status_msg "INFO" "Initiating installation script..."
+    sleep 1
+    
+    # Run the external script
+    bash <(curl -s https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/install.sh)
+    
+    echo ""
+    status_msg "OK" "Installation Sequence Complete."
+    pause
+}
+
+# ================== CREATE USER ==================
+create_user() {
+    show_header "USER MANAGEMENT"
+
+    if [ ! -d /var/www/pterodactyl ]; then
+        status_msg "ERR" "Panel directory not found (/var/www/pterodactyl)."
+        status_msg "ERR" "Please install the panel first."
+        pause
+        return
+    fi
+
+    status_msg "WAIT" "Launching Artisan User Maker..."
+    echo ""
+    cd /var/www/pterodactyl || exit
+    php artisan p:user:make
+
+    echo ""
+    status_msg "OK" "User created successfully."
+    pause
+}
+
+# ================= PANEL UNINSTALL =================
+uninstall_logic() {
+    status_msg "WAIT" "Stopping Panel services..."
+    systemctl stop pteroq.service 2>/dev/null || true
+    systemctl disable pteroq.service 2>/dev/null || true
+    rm -f /etc/systemd/system/pteroq.service
+    systemctl daemon-reload
+
+    status_msg "WAIT" "Removing cronjobs..."
+    crontab -l | grep -v 'php /var/www/pterodactyl/artisan schedule:run' | crontab - || true
+
+    status_msg "WAIT" "Deleting panel files..."
+    rm -rf /var/www/pterodactyl
+
+    status_msg "WAIT" "Dropping database and users..."
+    mysql -u root -e "DROP DATABASE IF EXISTS panel;"
+    mysql -u root -e "DROP USER IF EXISTS 'pterodactyl'@'127.0.0.1';"
+    mysql -u root -e "FLUSH PRIVILEGES;"
+
+    status_msg "WAIT" "Cleaning Nginx configs..."
+    rm -f /etc/nginx/sites-enabled/pterodactyl.conf
+    rm -f /etc/nginx/sites-available/pterodactyl.conf
+    systemctl reload nginx || true
+}
+
+uninstall_ptero() {
+    show_header "UNINSTALLATION"
+    
+    echo -e "${RED}  WARNING: This will delete all panel data and databases!${NC}"
+    read -p "  Are you sure you want to proceed? (y/N): " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        status_msg "INFO" "Uninstallation cancelled."
+        pause
+        return
+    fi
+
+    echo ""
+    uninstall_logic
+    
+    echo ""
+    status_msg "OK" "Panel removed successfully (Wings untouched)."
+    pause
+}
+
+# ================= UPDATE FUNCTION =================
+update_panel() {
+    show_header "SYSTEM UPDATE"
+
+    if [ ! -d /var/www/pterodactyl ]; then
+        status_msg "ERR" "Panel not found in /var/www/pterodactyl"
+        pause
+        return
+    fi
+
+    status_msg "INFO" "Putting panel into Maintenance Mode..."
+    cd /var/www/pterodactyl
+    php artisan down
+    cd /var/www/pterodactyl
+    status_msg "INFO" "Downloading latest release..."
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
+    
+    status_msg "INFO" "Setting permissions..."
+    chmod -R 755 storage/* bootstrap/cache
+    
+    status_msg "INFO" "Updating Composer dependencies..."
+    COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+    
+    status_msg "INFO" "Clearing cache and database migration..."
+    php artisan view:clear
+    php artisan config:clear
+    php artisan migrate --seed --force
+    chown -R www-data:www-data /var/www/pterodactyl/*
+    
+    status_msg "INFO" "Restarting Queue Workers..."
+    php artisan queue:restart
+    php artisan up
+
+    echo ""
+    status_msg "OK" "Panel Updated Successfully."
+    pause
+}
+
+# ===================== MAIN MENU =====================
+while true; do
+    clear
+    
+    # Banner
+    echo -e "${PURPLE}  ____  _                     _            _         _ ${NC}"
+    echo -e "${PURPLE} |  _ \| |_ ___ _ __ ___   __| | __ _  ___| |_ _   _| |${NC}"
+    echo -e "${PURPLE} | |_) | __/ _ \ '__/ _ \ / _\` |/ _\` |/ __| __| | | | |${NC}"
+    echo -e "${PURPLE} |  __/| ||  __/ | | (_) | (_| | (_| | (__| |_| |_| | |${NC}"
+    echo -e "${PURPLE} |_|    \__\___|_|  \___/ \__,_|\__,_|\___|\__|\__, |_|${NC}"
+    echo -e "${PURPLE}                                               |___/   ${NC}"
+    echo -e ""
+    
+    echo -e "${CYAN} ┌───────────────────────────────────────────────────────┐${NC}"
+
+    # --- CHECK INSTALL STATUS ---
+    if [ -d "/var/www/pterodactyl" ]; then
+        # Green "INSTALLED" message
+        echo -e "${CYAN} │${NC} ${BOLD}${WHITE}PANEL STATUS:${NC} ${GREEN}INSTALLED ✔${NC}                                 ${CYAN}│${NC}"
+    else
+        # Red "NOT INSTALLED" message
+        echo -e "${CYAN} │${NC} ${BOLD}${WHITE}PANEL STATUS:${NC} ${RED}NOT INSTALLED ✘${NC}                             ${CYAN}│${NC}"
+    fi
+
+    echo -e "${CYAN} ├───────────────────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN} │${NC}                                                       ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${GREEN}[1]${NC} Install Panel     ${GRAY}:: (Fresh Install)${NC}          ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${GREEN}[2]${NC} Create User       ${GRAY}:: (Add Admin/User)${NC}        ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${YELLOW}[3]${NC} Update Panel      ${GRAY}:: (Latest Release)${NC}        ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${RED}[4]${NC} Domin                ${GRAY}:: (Chang/domin/ssl)${NC}           ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${RED}[5]${NC} Uninstall Panel   ${GRAY}:: (Remove Data)${NC}           ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}                                                       ${CYAN}│${NC}"
+    echo -e "${CYAN} │${NC}  ${WHITE}[6] Exit System${NC}                                   ${CYAN}│${NC}"
+    echo -e "${CYAN} └───────────────────────────────────────────────────────┘${NC}"
+    echo ""
+    echo -ne "${BOLD}${WHITE}  root@ptero:~# ${NC}"
+    read choice
+
+    case $choice in
+        1) installptero ;;
+==========================================
 #  CYBERPUNK PTERODACTYL AUTO DEPLOY v3
 # ==========================================
 
@@ -392,28 +718,39 @@ EOF
 
 systemctl daemon-reload
 systemctl enable --now redis-server
-systemctl enable --now pteroq.service
-ok "Queue running"
-ok "NGINX configured."
-
-clear
-step "Create admin user"
-deploy_bar
-# --- Admin User ---
-cd /var/www/pterodactyl
-sed -i '/^APP_ENVIRONMENT_ONLY=/d' .env
-echo "APP_ENVIRONMENT_ONLY=false" >> .env
-php artisan p:user:make
-
-# ---------------- DONE ----------------
-
-echo ""
-line
-echo -e "${GREEN}🚀 Deployment Complete!${RESET}"
-echo -e "${WHITE}Access your panel at:${RESET} ${CYAN}https://$DOMAIN${RESET}"
-line
-echo -e "${GRAY}SYSTEM STATUS: STABLE | FIREWALL: ACTIVE | DATABASE: CONNECTED${RESET}"
-echo ""
+        2) create_user ;;
+        3) update_panel ;;
+        4) bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/ssl.sh) ;;
+        5) uninstall_ptero ;;
+        6) clear; exit ;;
+        *) echo -e "${RED}  Invalid option selected...${NC}"; sleep 1 ;;
+    esac
+done
+            pause
+            ;;
+        5)
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/002)
+            pause
+            ;;
+        6)
+            bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/refs/heads/main/ssh.sh)
+            pause
+            ;;
+        7)
+            curl -fsSL https://tailscale.com/install.sh | sh
+            pause
+            ;;
+        8)
+            echo -e "${G}👋 TYRKROX NODE ROCKS 😎🔥${N}"
+            sleep 1
+            exit 0
+            ;;
+        *)
+            echo -e "${R}❌ Invalid Option!${N}"
+            sleep 1.5
+            ;;
+    esac
+done
             pause
             ;;
         5)
