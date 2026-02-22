@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
-# ===== COLORS =====
 G=$'\033[32m'
 R=$'\033[31m'
 C=$'\033[36m'
 Y=$'\033[33m'
-W=$'\033[97m'
 N=$'\033[0m'
 
 pause(){ read -p "Press Enter to continue..." temp; }
 
-# ===== BOOT ANIMATION =====
 typewriter() {
     text="$1"
     for ((i=0; i<${#text}; i++)); do
@@ -24,30 +21,23 @@ typewriter() {
 boot_animation(){
 clear
 echo -e "${C}"
-typewriter "Initializing Tyrkrox Hyper System..."
+typewriter "🚀 Initializing Tyrkrox Hyper System..."
 sleep 0.5
-typewriter "Loading Core Modules..."
+typewriter "⚙️ Loading Modules..."
 sleep 0.5
-typewriter "Checking System Compatibility..."
+typewriter "🔍 Checking Compatibility..."
 sleep 0.5
-echo -e "${G}System Ready ✅${N}"
+echo -e "${G}✅ System Ready${N}"
 sleep 1
 }
 
 header(){
 clear
 echo -e "${C}"
-echo "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗"
-echo "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗"
-echo "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝"
-echo "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗"
-echo "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║"
-echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
-echo -e "${Y}=========== TYRKROX CONTROL PANEL ===========${N}"
-echo ""
+echo "=========== 🚀 TYRKROX CONTROL PANEL 🚀 ==========="
+echo -e "${N}"
 }
 
-# ===== AUTO CHECK =====
 install_docker(){
 if ! command -v docker &> /dev/null; then
     echo -e "${Y}Installing Docker...${N}"
@@ -58,100 +48,94 @@ fi
 
 # ================= PANEL =================
 
-install_panel(){
-header
-apt update -y
-apt install -y nginx mysql-server php php-fpm curl unzip
-mkdir -p /var/www/panel
-echo "Panel Installed Successfully" > /var/www/panel/index.html
-systemctl restart nginx
-echo -e "${G}Panel Installed Successfully ✅${N}"
-pause
-}
-
-create_panel_user(){
-header
-read -p "Username: " user
-read -p "Password: " pass
-useradd -m $user
-echo "$user:$pass" | chpasswd
-echo -e "${G}User Created Successfully ✅${N}"
-pause
-}
-
-update_panel(){
-header
-apt update -y && apt upgrade -y
-echo -e "${G}System Updated Successfully ✅${N}"
-pause
-}
-
-uninstall_panel(){
-header
-rm -rf /var/www/panel
-apt remove -y nginx mysql-server php*
-echo -e "${R}Panel Removed Successfully ❌${N}"
-pause
-}
-
 panel_menu(){
 while true; do
 header
-echo "[1] Install Panel"
-echo "[2] Create Panel User"
-echo "[3] Update Panel"
-echo "[4] Uninstall Panel"
-echo "[0] Back"
+echo "🖥️ PANEL MANAGEMENT"
+echo ""
+echo "[1] 📥 Install Panel"
+echo "[2] 👤 Create Panel User"
+echo "[3] 🔄 Update Panel"
+echo "[4] 🗑️ Uninstall Panel"
+echo "[0] 🔙 Back"
 echo ""
 
 read -p "Select Option: " p
 case $p in
-1) install_panel ;;
-2) create_panel_user ;;
-3) update_panel ;;
-4) uninstall_panel ;;
+1)
+apt update -y
+apt install -y nginx mysql-server php php-fpm curl unzip
+mkdir -p /var/www/panel
+echo "Panel Installed" > /var/www/panel/index.html
+systemctl restart nginx
+echo "✅ Panel Installed"
+pause ;;
+2)
+read -p "Username: " user
+read -p "Password: " pass
+useradd -m $user
+echo "$user:$pass" | chpasswd
+echo "✅ User Created"
+pause ;;
+3)
+apt update -y && apt upgrade -y
+echo "✅ Panel Updated"
+pause ;;
+4)
+rm -rf /var/www/panel
+apt remove -y nginx mysql-server php*
+echo "❌ Panel Removed"
+pause ;;
 0) break ;;
-*) echo "Invalid Option"; sleep 1 ;;
+*) echo "Invalid"; sleep 1 ;;
 esac
 done
 }
 
-# ================= IVM (DOCKER VM MANAGER) =================
+# ================= IVM (Docker Based) =================
 
 ivm_menu(){
 install_docker
 while true; do
 header
-echo -e "${C}IVM MANAGER (Docker Based)${N}"
+echo "📦 IVM MANAGER"
 echo ""
-echo "1) Create Container"
-echo "2) Start Container"
-echo "3) Stop Container"
-echo "4) Delete Container"
-echo "5) List Containers"
-echo "0) Back"
+echo "[1] ➕ Create VM"
+echo "[2] ▶️ Start VM"
+echo "[3] ⏹️ Stop VM"
+echo "[4] 🗑️ Delete VM"
+echo "[5] ⚙️ Edit VM"
+echo "[6] 📋 List VMs"
+echo "[0] 🔙 Back"
 echo ""
 
 read -p "Select Option: " i
 case $i in
 1)
-read -p "Container Name: " NAME
+read -p "VM Name: " NAME
 docker run -dit --name $NAME ubuntu:22.04
-echo -e "${G}Container Created ✅${N}"
+echo "✅ VM Created"
 pause ;;
 2)
-read -p "Container Name: " NAME
+read -p "VM Name: " NAME
 docker start $NAME
 pause ;;
 3)
-read -p "Container Name: " NAME
+read -p "VM Name: " NAME
 docker stop $NAME
 pause ;;
 4)
-read -p "Container Name: " NAME
+read -p "VM Name: " NAME
 docker rm -f $NAME
 pause ;;
 5)
+read -p "VM Name: " NAME
+read -p "New RAM (MB): " RAM
+read -p "New CPU Limit: " CPU
+docker update --memory="${RAM}m" --cpus="$CPU" $NAME
+echo "✅ VM Updated"
+pause ;;
+6)
 docker ps -a
 pause ;;
 0) break ;;
@@ -162,70 +146,85 @@ done
 
 # ================= KVM MANAGER =================
 
-kvm_menu(){
+create_kvm_vm(){
 header
 if ! egrep -q '(vmx|svm)' /proc/cpuinfo; then
-echo -e "${R}❌ KVM NOT Supported on this system${N}"
+echo "❌ KVM Not Supported"
 pause
 return
 fi
 
-apt install -y qemu-kvm libvirt-daemon-system virtinst
+echo "🆕 CREATE NEW VM"
+read -p "📛 VM Name: " VMNAME
+read -p "💾 RAM (MB): " RAM
+read -p "🧠 CPU Cores: " CPU
+read -p "🗄️ Disk Size (GB): " DISK
+read -p "📀 ISO Path: " ISO
 
+echo ""
+echo "Confirm Creation? (y/n)"
+read confirm
+if [[ $confirm != "y" ]]; then
+echo "Cancelled"
+pause
+return
+fi
+
+qemu-img create -f qcow2 /var/lib/libvirt/images/$VMNAME.qcow2 ${DISK}G
+
+virt-install \
+--name $VMNAME \
+--ram $RAM \
+--vcpus $CPU \
+--disk path=/var/lib/libvirt/images/$VMNAME.qcow2 \
+--cdrom $ISO \
+--os-type linux \
+--network network=default \
+--graphics vnc \
+--noautoconsole
+
+echo "✅ VM Created Successfully"
+pause
+}
+
+kvm_menu(){
 while true; do
 header
-echo -e "${C}SYSTEM MANAGER ACTIVE ► Pure QEMU Environment${N}"
+echo "💻 KVM MANAGER"
 echo ""
-echo "1) Create VM"
-echo "2) List VMs"
-echo "3) Start VM"
-echo "4) Stop VM"
-echo "5) Delete VM"
-echo "0) Back"
+echo "[1] 🆕 Create New VM"
+echo "[2] 📋 List VMs"
+echo "[3] ▶️ Start VM"
+echo "[4] ⏹️ Stop VM"
+echo "[5] 🗑️ Delete VM"
+echo "[0] 🔙 Back"
 echo ""
 
 read -p "Select Option: " k
 case $k in
-1)
-read -p "VM Name: " VMNAME
-qemu-img create -f qcow2 /var/lib/libvirt/images/$VMNAME.qcow2 10G
-echo -e "${G}VM Disk Created (10GB) ✅${N}"
-pause ;;
-2)
-virsh list --all
-pause ;;
-3)
-read -p "VM Name: " VMNAME
-virsh start $VMNAME
-pause ;;
-4)
-read -p "VM Name: " VMNAME
-virsh shutdown $VMNAME
-pause ;;
-5)
-read -p "VM Name: " VMNAME
-virsh undefine $VMNAME
-pause ;;
+1) create_kvm_vm ;;
+2) virsh list --all; pause ;;
+3) read -p "VM Name: " VM; virsh start $VM; pause ;;
+4) read -p "VM Name: " VM; virsh shutdown $VM; pause ;;
+5) read -p "VM Name: " VM; virsh undefine $VM; pause ;;
 0) break ;;
 *) echo "Invalid"; sleep 1 ;;
 esac
 done
 }
 
-# ================= WINGS =================
+# ================= OTHER =================
 
 install_wings(){
 install_docker
-echo -e "${G}Wings Installed (Docker Ready) ✅${N}"
+echo "🐳 Wings Installed"
 pause
 }
-
-# ================= PROXMOX =================
 
 install_proxmox(){
 install_docker
 docker run -itd --name proxmoxve --privileged -p 8006:8006 rtedpro/proxmox:9.0.11
-echo -e "${G}Proxmox Running on Port 8006 🚀${N}"
+echo "🌐 Proxmox Running on Port 8006"
 pause
 }
 
@@ -235,16 +234,15 @@ boot_animation
 
 while true; do
 header
-echo "[1] Panel Install"
-echo "[2] Install Wings"
-echo "[3] IVM Manager"
-echo "[4] KVM Manager"
-echo "[5] Install Proxmox"
-echo "[0] Exit"
+echo "[1] 🖥️ Panel Install"
+echo "[2] 🐳 Install Wings"
+echo "[3] 📦 IVM Manager"
+echo "[4] 💻 KVM Manager"
+echo "[5] 🌐 Install Proxmox"
+echo "[0] ❌ Exit"
 echo ""
 
 read -p "Select Option: " opt
-
 case $opt in
 1) panel_menu ;;
 2) install_wings ;;
@@ -252,7 +250,6 @@ case $opt in
 4) kvm_menu ;;
 5) install_proxmox ;;
 0) exit 0 ;;
-*) echo "Invalid Option"; sleep 1 ;;
+*) echo "Invalid"; sleep 1 ;;
 esac
-
 done
