@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-# ==========================================
-#   🚀 TYRKROX_GAMER - ALL IN ONE TOOL
-# ==========================================
 
 set -u
 
-# ==== COLORS ====
+# ===== COLORS =====
 C=$'\033[36m'
 G=$'\033[32m'
 R=$'\033[31m'
@@ -14,7 +11,7 @@ Y=$'\033[33m'
 W=$'\033[97m'
 N=$'\033[0m'
 
-# ==== BIG HEADER ====
+# ===== BIG HEADER =====
 header() {
 clear
 echo -e "${C}"
@@ -28,32 +25,73 @@ cat << "EOF"
    ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
 
 EOF
-echo -e "${Y}🚀 TYRKROX_GAMER - PREMIUM SERVER TOOL 🚀${N}"
+echo -e "${Y}🚀 TYRKROX_GAMER - ULTIMATE SERVER TOOL 🚀${N}"
 echo -e "${B}=========================================================${N}"
 echo ""
 }
 
 pause() {
 echo ""
-read -p "Press [Enter] to return to menu..." dummy
+read -p "Press [Enter] to continue..." dummy
 }
 
-# ==== MAIN LOOP ====
+# ===== PANEL SUBMENU =====
+panel_menu() {
+while true; do
+clear
+echo -e "${B}==========================================${N}"
+echo -e "${Y}        SERVER PANEL MANAGER${N}"
+echo -e "${B}==========================================${N}"
+echo ""
+echo " 1) FeatherPanel"
+echo " 2) Pterodactyl"
+echo " 3) Jexactyl"
+echo " 4) JexPanel"
+echo " 5) MythicalDash"
+echo " 6) MythicalDash v3"
+echo " 7) Payment Gateway"
+echo " 8) CtrlPanel"
+echo " 9) Reviacly"
+echo "10) Tools (Ext)"
+echo -e "${R}11) Back${N}"
+echo ""
+
+read -p "Enter your choice [1-11]: " panel_choice
+
+case $panel_choice in
+1) echo "Installing FeatherPanel..." ;;
+2) bash <(curl -s https://pterodactyl-installer.se) ;;
+3) echo "Installing Jexactyl..." ;;
+4) echo "Installing JexPanel..." ;;
+5) echo "Installing MythicalDash..." ;;
+6) echo "Installing MythicalDash v3..." ;;
+7) echo "Installing Payment Gateway..." ;;
+8) echo "Installing CtrlPanel..." ;;
+9) echo "Installing Reviacly..." ;;
+10) echo "Installing Extra Tools..." ;;
+11) break ;;
+*) echo "Invalid option!" ; sleep 2 ;;
+esac
+
+pause
+done
+}
+
+# ===== MAIN MENU =====
 while true; do
 header
 
 echo -e "${C} 1) ${W}Discord Server Link${N}"
 echo -e "${C} 2) ${W}YouTube Channel Link${N}"
 echo -e "${C} 3) ${W}VM / KVM Installer${N}"
-echo -e "${C} 4) ${W}Pterodactyl Panel + Wings${N}"
-echo -e "${C} 5) ${W}Blueprint + Addons${N}"
-echo -e "${C} 6) ${W}SFTP Fixer${N}"
-echo -e "${C} 7) ${W}Tailscale VPN${N}"
-echo -e "${C} 8) ${W}Proxmox Docker Install${N}"
-echo -e "${R} 9) Exit${N}"
+echo -e "${C} 4) ${W}Panel + Wings Manager${N}"
+echo -e "${C} 5) ${W}SFTP Fixer${N}"
+echo -e "${C} 6) ${W}Tailscale VPN${N}"
+echo -e "${C} 7) ${W}Proxmox Docker Install${N}"
+echo -e "${R} 8) Exit${N}"
 echo ""
 
-read -p "👉 Select option [1-9]: " choice
+read -p "👉 Select option [1-8]: " choice
 
 case $choice in
 1)
@@ -66,27 +104,34 @@ pause ;;
 bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/001)
 pause ;;
 4)
-bash <(curl -s https://pterodactyl-installer.se)
-pause ;;
+panel_menu ;;
 5)
-bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/002)
-pause ;;
-6)
 bash <(curl -fsSL https://raw.githubusercontent.com/OfficialCodesHub/NOTHING/main/ssh.sh)
 pause ;;
-7)
+6)
 curl -fsSL https://tailscale.com/install.sh | sh
 pause ;;
-8)
+7)
+echo "🚀 Installing Proxmox (Docker Version)..."
+
 docker run -itd \
 --name proxmoxve \
 --hostname pve \
 --privileged \
+--cgroupns=host \
+--security-opt apparmor=unconfined \
+--security-opt seccomp=unconfined \
+-v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+-v /lib/modules:/lib/modules:ro \
+-v /dev/fuse:/dev/fuse \
 -p 8006:8006 \
+--restart unless-stopped \
 rtedpro/proxmox:9.0.11
+
+echo "✅ Proxmox started on port 8006"
 pause ;;
-9)
-echo "👋 Exiting... Thanks for using!"
+8)
+echo "👋 Exiting..."
 exit 0 ;;
 *)
 echo "❌ Invalid Option!"
