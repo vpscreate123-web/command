@@ -34,9 +34,9 @@ spinner() {
 boot_animation() {
 clear
 echo -e "${C}"
-typewriter "Initializing Tyrkrox Hyper System..."
+typewriter "Initializing Private Hyper System..."
 sleep 0.4
-typewriter "Loading Modules..."
+typewriter "Loading Secure Modules..."
 sleep 0.4
 typewriter "Checking Virtualization..."
 sleep 0.4
@@ -47,15 +47,15 @@ sleep 1
 header() {
 clear
 echo -e "${C}"
-echo "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗"
-echo "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗"
-echo "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝"
-echo "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗"
-echo "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║"
-echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
+echo "██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗"
+echo "██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝"
+echo "██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗  "
+echo "██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  "
+echo "██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗"
+echo "╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝"
 echo -e "${N}"
 echo -e "${Y}"
-typewriter "=========== TYRKROX CONTROL PANEL ==========="
+typewriter "=========== PRIVATE CONTROL PANEL ==========="
 echo -e "${N}"
 echo ""
 }
@@ -65,9 +65,9 @@ pause(){ read -p "Press Enter to continue..." temp; }
 # ===== PANEL =====
 panel_status() {
 if [ -d "/var/www/panel" ]; then
-echo -e "${G}PANEL STATUS: INSTALLED ✅${N}"
+echo -e "${G}PRIVATE PANEL STATUS: INSTALLED ✅${N}"
 else
-echo -e "${R}PANEL STATUS: NOT INSTALLED ❌${N}"
+echo -e "${R}PRIVATE PANEL STATUS: NOT INSTALLED ❌${N}"
 fi
 }
 
@@ -77,7 +77,7 @@ panel_status
 echo ""
 apt update -y & spinner
 apt install -y curl git unzip software-properties-common & spinner
-echo -e "${G}Panel Base Installed (Demo Setup)${N}"
+echo -e "${G}Private Panel Base Installed (Secure Setup)${N}"
 pause
 }
 
@@ -144,7 +144,7 @@ boot_animation
 
 while true; do
 header
-echo -e "${C}[1]${W} Pterodactyl Panel${N}"
+echo -e "${C}[1]${W} Private Panel${N}"
 echo -e "${C}[2]${W} Install Wings${N}"
 echo -e "${C}[3]${W} Create IVM${N}"
 echo -e "${C}[4]${W} Create KVM${N}"
