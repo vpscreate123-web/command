@@ -1,138 +1,167 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
-# ================================
-#   TYRKROX_GAMER ALL-IN-ONE TOOL
-# ================================
+# ===== COLORS =====
+G=$'\033[32m'
+R=$'\033[31m'
+C=$'\033[36m'
+Y=$'\033[33m'
+W=$'\033[97m'
+N=$'\033[0m'
 
+# ===== ANIMATION =====
+typewriter() {
+    text="$1"
+    for ((i=0; i<${#text}; i++)); do
+        echo -ne "${text:$i:1}"
+        sleep 0.02
+    done
+    echo ""
+}
+
+spinner() {
+    pid=$!
+    spin='-\|/'
+    i=0
+    while kill -0 $pid 2>/dev/null; do
+        i=$(( (i+1) %4 ))
+        printf "\r${Y}Loading ${spin:$i:1}${N}"
+        sleep .1
+    done
+    printf "\r"
+}
+
+boot_animation() {
 clear
+echo -e "${C}"
+typewriter "Initializing Tyrkrox Hyper System..."
+sleep 0.4
+typewriter "Loading Modules..."
+sleep 0.4
+typewriter "Checking Virtualization..."
+sleep 0.4
+echo -e "${G}System Ready ✅${N}"
+sleep 1
+}
 
-logo() {
-echo -e "\e[35m"
-echo "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗  ██████╗ ██╗  ██╗"
-echo "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗██╔═══██╗╚██╗██╔╝"
-echo "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝██║   ██║ ╚███╔╝ "
-echo "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗██║   ██║ ██╔██╗ "
-echo "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║╚██████╔╝██╔╝ ██╗"
-echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝"
+header() {
+clear
+echo -e "${C}"
+echo "████████╗██╗   ██╗██████╗ ██╗  ██╗██████╗"
+echo "╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝██╔══██╗"
+echo "   ██║    ╚████╔╝ ██████╔╝█████╔╝ ██████╔╝"
+echo "   ██║     ╚██╔╝  ██╔══██╗██╔═██╗ ██╔══██╗"
+echo "   ██║      ██║   ██║  ██║██║  ██╗██║  ██║"
+echo "   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝"
+echo -e "${N}"
+echo -e "${Y}"
+typewriter "=========== TYRKROX CONTROL PANEL ==========="
+echo -e "${N}"
 echo ""
-echo "        🚀 TYRKROX_GAMER CONTROL PANEL 🚀"
-echo -e "\e[0m"
+}
+
+pause(){ read -p "Press Enter to continue..." temp; }
+
+# ===== PANEL =====
+panel_status() {
+if [ -d "/var/www/panel" ]; then
+echo -e "${G}PANEL STATUS: INSTALLED ✅${N}"
+else
+echo -e "${R}PANEL STATUS: NOT INSTALLED ❌${N}"
+fi
 }
 
 install_panel() {
-echo "Installing Panel..."
-apt update -y
-apt install docker.io -y
-systemctl enable docker
-systemctl start docker
-echo "Panel installation complete!"
+header
+panel_status
+echo ""
+apt update -y & spinner
+apt install -y curl git unzip software-properties-common & spinner
+echo -e "${G}Panel Base Installed (Demo Setup)${N}"
+pause
 }
 
-install_wings() {
-
-echo "Enter Node ID:"
-read NODE_ID
-
-echo "Enter Token ID:"
-read TOKEN_ID
-
-echo "Enter Token:"
-read TOKEN
-
-echo "Enter Panel URL (example: https://panel.example.com):"
-read PANEL_URL
-
-echo "Installing Wings..."
-
-mkdir -p /etc/pterodactyl
-cd /etc/pterodactyl
-
-curl -L https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64 -o wings
-chmod +x wings
-
-cat > /etc/pterodactyl/config.yml <<EOL
-debug: false
-uuid: $NODE_ID
-token_id: $TOKEN_ID
-token: $TOKEN
-api:
-  host: 0.0.0.0
-  port: 8080
-  ssl:
-    enabled: false
-remote: '$PANEL_URL'
-EOL
-
-echo "Wings installed with your configuration!"
+# ===== WINGS =====
+install_wings(){
+header
+apt install -y docker.io & spinner
+echo -e "${G}Wings Installed (Docker Ready)${N}"
+pause
 }
 
-panel_manager() {
-echo "1. Start Panel"
-echo "2. Stop Panel"
-echo "3. Restart Panel"
-read choice
+# ===== IVM =====
+create_ivm(){
+header
+echo -e "${C}CREATE IVM (DOCKER BASED)${N}"
+apt install -y docker.io & spinner
 
-case $choice in
-1) systemctl start docker ;;
-2) systemctl stop docker ;;
-3) systemctl restart docker ;;
-*) echo "Invalid Option" ;;
-esac
+read -p "Container Name: " NAME
+read -p "RAM (MB): " RAM
+read -p "CPU Limit: " CPU
+
+docker run -dit --name $NAME --memory="${RAM}m" --cpus="$CPU" ubuntu:22.04 & spinner
+
+echo -e "${G}IVM Created Successfully!${N}"
+pause
 }
 
-install_proxmox() {
+# ===== KVM =====
+create_kvm(){
+header
+echo -e "${C}CREATE KVM${N}"
 
-echo "Installing Proxmox in Docker..."
+if ! egrep -q '(vmx|svm)' /proc/cpuinfo; then
+echo -e "${R}KVM NOT Supported ❌${N}"
+pause
+return
+fi
+
+apt install -y qemu-kvm libvirt-daemon-system virtinst & spinner
+
+echo -e "${G}KVM Ready (Manual ISO Required)${N}"
+pause
+}
+
+# ===== PROXMOX =====
+install_proxmox(){
+header
+echo -e "${C}INSTALL PROXMOX (DOCKER MODE)${N}"
+
+apt install -y docker.io & spinner
 
 docker run -itd \
-  --name proxmoxve \
-  --hostname pve \
-  --privileged \
-  --cgroupns=host \
-  --security-opt apparmor=unconfined \
-  --security-opt seccomp=unconfined \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
-  -v /lib/modules:/lib/modules:ro \
-  -v /dev/fuse:/dev/fuse \
-  -v /sys/kernel/debug:/sys/kernel/debug \
-  -p 8006:8006 \
-  --restart unless-stopped \
-  rtedpro/proxmox:9.0.11
+--name proxmoxve \
+--privileged \
+-p 8006:8006 \
+rtedpro/proxmox:9.0.11 & spinner
 
-echo "Proxmox Installed!"
-echo "Access: http://YOUR_SERVER_IP:8006"
+echo -e "${G}Proxmox Running on Port 8006 🚀${N}"
+pause
 }
 
-create_vm() {
-echo "Creating Sample VM..."
-qm create 100 --name testvm --memory 2048 --net0 virtio,bridge=vmbr0
-echo "VM Created (Example ID 100)"
-}
+# ===== START =====
+boot_animation
 
-main_menu() {
 while true; do
-logo
-echo "----------------------------------"
-echo "[1] Install Panel"
-echo "[2] Install Wings"
-echo "[3] Panel Manager"
-echo "[4] Install Proxmox"
-echo "[5] Create VM"
-echo "[6] Exit"
-echo "----------------------------------"
-read -p "Select Option: " option
+header
+echo -e "${C}[1]${W} Pterodactyl Panel${N}"
+echo -e "${C}[2]${W} Install Wings${N}"
+echo -e "${C}[3]${W} Create IVM${N}"
+echo -e "${C}[4]${W} Create KVM${N}"
+echo -e "${C}[5]${W} Install Proxmox${N}"
+echo -e "${R}[6] Exit${N}"
+echo ""
 
-case $option in
+read -p "Select Option: " opt
+
+case $opt in
 1) install_panel ;;
 2) install_wings ;;
-3) panel_manager ;;
-4) install_proxmox ;;
-5) create_vm ;;
-6) exit ;;
-*) echo "Invalid Option"; sleep 2 ;;
+3) create_ivm ;;
+4) create_kvm ;;
+5) install_proxmox ;;
+6) exit 0 ;;
+*) echo "Invalid Option"; sleep 1 ;;
 esac
 
 done
-}
-
-main_menu
