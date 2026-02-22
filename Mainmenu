@@ -21,7 +21,7 @@ typewriter() {
 boot_animation(){
 clear
 echo -e "${C}"
-typewriter "🚀 Initializing Tyrkrox Hyper System..."
+typewriter "🚀 Initializing TYRKROX Hyper System..."
 sleep 0.5
 typewriter "⚙️ Loading Modules..."
 sleep 0.5
@@ -35,6 +35,7 @@ header(){
 clear
 echo -e "${C}"
 echo "=========== 🚀 TYRKROX CONTROL PANEL 🚀 ==========="
+echo "===============   OFFICIAL BUILD   ================"
 echo -e "${N}"
 }
 
@@ -43,6 +44,8 @@ if ! command -v docker &> /dev/null; then
     echo -e "${Y}Installing Docker...${N}"
     apt update -y
     apt install -y docker.io
+    systemctl enable docker
+    systemctl start docker
 fi
 }
 
@@ -66,7 +69,7 @@ case $p in
 apt update -y
 apt install -y nginx mysql-server php php-fpm curl unzip
 mkdir -p /var/www/panel
-echo "Panel Installed" > /var/www/panel/index.html
+echo "TYRKROX PANEL ACTIVE" > /var/www/panel/index.html
 systemctl restart nginx
 echo "✅ Panel Installed"
 pause ;;
@@ -149,7 +152,7 @@ done
 create_kvm_vm(){
 header
 if ! egrep -q '(vmx|svm)' /proc/cpuinfo; then
-echo "❌ KVM Not Supported"
+echo "❌ KVM Not Supported On This Machine"
 pause
 return
 fi
@@ -160,15 +163,6 @@ read -p "💾 RAM (MB): " RAM
 read -p "🧠 CPU Cores: " CPU
 read -p "🗄️ Disk Size (GB): " DISK
 read -p "📀 ISO Path: " ISO
-
-echo ""
-echo "Confirm Creation? (y/n)"
-read confirm
-if [[ $confirm != "y" ]]; then
-echo "Cancelled"
-pause
-return
-fi
 
 qemu-img create -f qcow2 /var/lib/libvirt/images/$VMNAME.qcow2 ${DISK}G
 
@@ -213,18 +207,35 @@ esac
 done
 }
 
-# ================= OTHER =================
+# ================= WINGS =================
 
 install_wings(){
 install_docker
-echo "🐳 Wings Installed"
+echo "🐳 Wings Docker Environment Ready"
 pause
 }
 
+# ================= PROXMOX (YOUR FULL COMMAND ADDED) =================
+
 install_proxmox(){
 install_docker
-docker run -itd --name proxmoxve --privileged -p 8006:8006 rtedpro/proxmox:9.0.11
-echo "🌐 Proxmox Running on Port 8006"
+
+docker run -itd \
+  --name proxmoxve \
+  --hostname pve \
+  --privileged \
+  --cgroupns=host \
+  --security-opt apparmor=unconfined \
+  --security-opt seccomp=unconfined \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+  -v /lib/modules:/lib/modules:ro \
+  -v /dev/fuse:/dev/fuse \
+  -v /sys/kernel/debug:/sys/kernel/debug \
+  -p 8006:8006 \
+  --restart unless-stopped \
+  rtedpro/proxmox:9.0.11
+
+echo "🌐 Proxmox Started On: https://SERVER-IP:8006"
 pause
 }
 
