@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# ==========================================
-#        🚀 TYRKROX NODE 🚀
-# ==========================================
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
 
 set -u
 
@@ -19,7 +18,7 @@ N=$'\033[0m'
 # ---- TYPEWRITER EFFECT ----
 typewriter() {
     text="$1"
-    delay=0.01
+    delay=0.005
     for ((i=0; i<${#text}; i++)); do
         printf "%s" "${text:$i:1}"
         sleep $delay
@@ -32,18 +31,18 @@ progress_bar() {
     echo -e "${C}Initializing TYRKROX NODE...${N}"
     for i in {1..30}; do
         printf "${G}#${N}"
-        sleep 0.05
+        sleep 0.03
     done
     echo ""
     for i in {0..100..10}; do
         printf "\r${Y}Loading System: $i%%%${N}"
-        sleep 0.2
+        sleep 0.15
     done
     echo ""
     sleep 1
 }
 
-# ---- CINEMATIC INTRO ----
+# ---- INTRO ----
 intro() {
     clear
     echo -e "${P}"
@@ -70,10 +69,66 @@ header() {
 
 pause() {
     echo ""
-    read -p "${W}🔁 Press [Enter] to return...${N}" dummy
+    read -p "${W}Press [Enter] to return...${N}" dummy
 }
 
-# ---- START INTRO ----
+# ---- PTERODACTYL MENU FUNCTION ----
+ptero_menu() {
+    while true; do
+        clear
+        echo "========================================="
+        echo "   PTERODACTYL CONTROL CENTER v2.1"
+        echo "========================================="
+        echo ""
+        echo "1) Install Panel"
+        echo "2) Create User"
+        echo "3) Update Panel"
+        echo "4) Install SSL"
+        echo "5) Uninstall Panel"
+        echo "6) Back to Main Menu"
+        echo ""
+        read -p "Select option: " opt
+
+        case $opt in
+            1)
+                bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/main/ptero/panel/pterodactyl/install.sh)
+                read -p "Press Enter..."
+                ;;
+            2)
+                cd /var/www/pterodactyl 2>/dev/null && php artisan p:user:make
+                read -p "Press Enter..."
+                ;;
+            3)
+                cd /var/www/pterodactyl || { echo "Panel not installed!"; sleep 2; continue; }
+                php artisan down
+                curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+                tar -xzvf panel.tar.gz
+                COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+                php artisan migrate --seed --force
+                php artisan up
+                read -p "Press Enter..."
+                ;;
+            4)
+                bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/main/ptero/panel/pterodactyl/ssl.sh)
+                read -p "Press Enter..."
+                ;;
+            5)
+                rm -rf /var/www/pterodactyl
+                echo "Panel Removed."
+                sleep 2
+                ;;
+            6)
+                break
+                ;;
+            *)
+                echo "Invalid option"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+# ---- START ----
 intro
 
 # ---- MAIN LOOP ----
@@ -81,26 +136,25 @@ while true; do
     clear
     header
 
-    echo -e "${C} 1) ${W}📢 Discord Server Link${N}"
-    echo -e "${C} 2) ${W}🐳 Proxmox VE (Docker) Install 🚀${N}"
-    echo -e "${C} 3) ${W}💻 VM/KVM Installer${N}"
-    echo -e "${C} 4) ${W}🌐 Pterodactyl Panel + Wings Installer${N}"
-    echo -e "${C} 5) ${W}🖥️ Blueprint + Addon Installer${N}"
-    echo -e "${C} 6) ${W}🔧 SFTP Fixer${N}"
-    echo -e "${C} 7) ${W}🌍 Tailscale VPN Installer${N}"
-    echo -e "${R} 8) ❌ Exit${N}"
+    echo -e "${C} 1) ${W}Discord Server Link${N}"
+    echo -e "${C} 2) ${W}Proxmox VE (Docker) Install 🚀${N}"
+    echo -e "${C} 3) ${W}VM/KVM Installer${N}"
+    echo -e "${C} 4) ${W}Pterodactyl Panel Installer${N}"
+    echo -e "${C} 5) ${W}Wings Installer${N}"
+    echo -e "${C} 6) ${W}Blueprint + Addon Installer${N}"
+    echo -e "${C} 7) ${W}SFTP Fixer${N}"
+    echo -e "${C} 8) ${W}Tailscale VPN Installer${N}"
+    echo -e "${R} 9) Exit${N}"
 
     echo ""
-    echo -e "${B}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${N}"
-    read -p "${Y}👉 Select an option [1-8]: ${N}" choice
+    read -p "${Y}Select an option [1-9]: ${N}" choice
 
     case $choice in
         1)
-            echo -e "${G}🔗 https://discord.gg/2rYEHharqA${N}"
+            echo -e "${G}https://discord.gg/2rYEHharqA${N}"
             pause
             ;;
         2)
-            echo -e "${Y}🐳 Installing Proxmox VE...${N}"
             docker run -itd \
               --name proxmoxve \
               --hostname pve \
@@ -117,76 +171,36 @@ while true; do
               rtedpro/proxmox:9.0.11
             pause
             ;;
-        3)bash <(curl -fsSL https://raw.githubusercontent.com/vpscreate123-web/mainnemu/main/Mainmenu)
+        3)
+            bash <(curl -fsSL https://raw.githubusercontent.com/vpscreate123-web/mainnemu/main/Mainmenu)
             pause
             ;;
-        4) 
-#!/bin/bash
-
-while true; do
-    clear
-    echo "========================================="
-    echo "   PTERODACTYL CONTROL CENTER v2.1"
-    echo "========================================="
-    echo ""
-    echo "1) Install Panel"
-    echo "2) Create User"
-    echo "3) Update Panel"
-    echo "4) Install SSL"
-    echo "5) Uninstall Panel"
-    echo "6) Exit"
-    echo ""
-    read -p "Select option: " opt
-
-    case $opt in
-        1)
-            bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/install.sh)
-            read -p "Press Enter..."
-            ;;
-        2)
-            cd /var/www/pterodactyl && php artisan p:user:make
-            read -p "Press Enter..."
-            ;;
-        3)
-            cd /var/www/pterodactyl
-            php artisan down
-            curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-            tar -xzvf panel.tar.gz
-            COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
-            php artisan migrate --seed --force
-            php artisan up
-            read -p "Press Enter..."
-            ;;
         4)
-            bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/refs/heads/main/ptero/panel/pterodactyl/ssl.sh)
-            read -p "Press Enter..."
+            ptero_menu
             ;;
         5)
-            rm -rf /var/www/pterodactyl
-            read -p "Press Enter..."
+            bash <(curl -fsSL https://raw.githubusercontent.com/nobita329/ptero/main/ptero/wings/install.sh)
+            pause
             ;;
         6)
-            exit 0
-            ;;
-        *)
-            echo "Invalid option"
-            sleep 1
-            ;;
-    esac
-done
+            echo "Blueprint installer coming soon..."
             pause
             ;;
         7)
-            curl -fsSL https://tailscale.com/install.sh | sh
+            systemctl restart ssh
             pause
             ;;
         8)
-            echo -e "${G}👋 TYRKROX NODE ROCKS 😎🔥${N}"
+            curl -fsSL https://tailscale.com/install.sh | sh
+            pause
+            ;;
+        9)
+            echo -e "${G}TYRKROX NODE ROCKS 😎🔥${N}"
             sleep 1
             exit 0
             ;;
         *)
-            echo -e "${R}❌ Invalid Option!${N}"
+            echo -e "${R}Invalid Option!${N}"
             sleep 1.5
             ;;
     esac
